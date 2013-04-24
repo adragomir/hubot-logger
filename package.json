@@ -1,6 +1,6 @@
 {
   "name": "hubot-logger",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A logger script for Hubot",
   "main": "index.coffee",
   "scripts": {
