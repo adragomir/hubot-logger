@@ -30,19 +30,26 @@ module.exports = (robot) ->
         d = new Date()
         room = req.params.room
         db.all "select * from chanlog where chan = ? order by ts asc limit 10000", room, (err, rows) ->
-            s = ""
-            for row in rows
-                s += "[" + new Tempus(row.ts).toString("%Y-%m-%d %H:%M:%S") + "] <" + row.user + "> " + row.message + "\n"
-            res.end s
+            if err != null
+                res.end err
+            else
+                s = ""
+                for row in rows
+                    s += "[" + new Tempus(row.ts).toString("%Y-%m-%d %H:%M:%S") + "] <" + row.user + "> " + row.message + "\n"
+                res.end s
 
     robot.router.get "/irclogs/:room/:date", (req, res) ->
         start_date = new Tempus(new Date(req.params.date))
         end_date = start_date.clone().addDate(1)
+        util.puts("from: " + start_date)
+        util.puts("to: " + end_date)
         room = req.params.room
-        db.all "select * from chanlog where chan = ? and ts between ? and ? order by ts asc limit 10000", [room, start_date, end_date], (err, rows) ->
-            s = ""
-            for row in rows
-                s += "[" + new Tempus(row.ts).toString("%Y-%m-%d %H:%M:%S") + "] <" + row.user + "> " + row.message + "\n"
-            res.end s
-
+        db.all "select * from chanlog where chan = ? and ts between " + start_date + " and " + end_date + " order by ts asc limit 10000", room, (err, rows) ->
+            if err != null
+                res.end err
+            else
+                s = ""
+                for row in rows
+                    s += "[" + new Tempus(row.ts).toString("%Y-%m-%d %H:%M:%S") + "] <" + row.user + "> " + row.message + "\n"
+                res.end s
 #vim:set expandtab sw=4 ts=4
