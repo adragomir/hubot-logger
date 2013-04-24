@@ -1,0 +1,10 @@
+div.channels
+  ul
+    - each channel in channels
+      li
+        a(href= '/irclogs/' + channel + '/latest') #{channel}
+        = ' ('
+        a(href= '/irclogs/' + channel '/index') index
+        = ' | '
+        a(href= '/irclogs/' + channel + '/latest') latest
+        = ')'

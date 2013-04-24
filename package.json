@@ -1,6 +1,6 @@
 {
   "name": "hubot-logger",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A logger script for Hubot",
   "main": "index.coffee",
   "scripts": {
@@ -19,8 +19,8 @@
     "name": "Andrei Dragomir"
   }, 
   "dependencies": {
-    "sqlite3": "2.1.7", 
-    "Tempus": "0.1.0"
+    "Tempus": "0.1.0", 
+    "mkdirp": "0.3.5"
   }, 
   "license": "BSD"
 }
