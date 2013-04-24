@@ -1,0 +1,26 @@
+{
+  "name": "hubot-logger",
+  "version": "0.0.1",
+  "description": "A logger script for Hubot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adragomir/hubot-logger.git"
+  },
+  "keywords": [
+    "hubot",
+    "irc",
+    "log"
+  ],
+  "author": {
+    name: "Andrei Dragomir",
+  }, 
+  "dependencies": {
+    "sqlite3": "2.1.7", 
+    "Tempus": "0.1.0"
+  }, 
+  "license": "BSD"
+}
