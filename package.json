@@ -2,7 +2,7 @@
   "name": "hubot-logger",
   "version": "0.0.1",
   "description": "A logger script for Hubot",
-  "main": "index.js",
+  "main": "index.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,7 +16,7 @@
     "log"
   ],
   "author": {
-    name: "Andrei Dragomir",
+    "name": "Andrei Dragomir"
   }, 
   "dependencies": {
     "sqlite3": "2.1.7", 
