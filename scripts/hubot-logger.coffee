@@ -10,10 +10,13 @@ mkdirp = require("mkdirp").sync
 
 log_streams = {}
 
-log_message = (root, date, type, channel, nick, message) ->
+log_message = (root, date, type, channel, meta) ->
   mkdirp(path.resolve root, channel)
   log_file = path.resolve root, channel, date.toString("%Y-%m-%d") + '.txt'
-  fs.appendFile log_file, JSON.stringify({"date": date, "type": type, "channel": channel, "nick": nick, "message": message}) + '\n', (err) ->
+  meta.date = date
+  meta.channel = channel
+  meta.type = type
+  fs.appendFile log_file, JSON.stringify(meta) + '\n', (err) ->
     if err
       throw err
 
@@ -59,14 +62,12 @@ render_log = (req, res, channel, file, date, dates, latest) ->
       buffer = ''
 
   stream.on 'data', (data) ->
-    util.puts("data: " + data)
     buffer += data
     parse_events(false)
 
   stream.on 'end', () ->
     parse_events(true)
     indexPosition = dates.indexOf(date)
-    util.puts("RENDER: " + events.length)
     res.render('log', {
       events: events,
       channel: channel,
@@ -83,33 +84,59 @@ render_log = (req, res, channel, file, date, dates, latest) ->
 module.exports = (robot) ->
     # init logging
     util.puts(util.inspect(robot))
+    util.puts(util.inspect(robot.adapter.bot))
+    util.puts(util.inspect(robot.adapter.bot.opt.channels))
     logs_root = process.env.IRCLOGS_FOLDER || "/var/irclogs/logs"
     mkdirp(logs_root)
 
-    robot.logger_orig_receive = robot.receive
-    robot.receive = (message) ->
-      if message instanceof TextMessage
-        channel = message.room
-        nick = message.user.name
-        text = message.text
-        type = "message"
-      if message instanceof LeaveMessage
-        channel = message.room
-        nick = message.user.name
-        text = util.format("%s has left %s", nick, channel)
-        type = "quit"
-      if message instanceof EnterMessage
-        channel = message.room
-        nick = message.user.name
-        text = util.format("%s has joined %s", nick, channel)
-        type = "enter"
-      now = new Tempus()
-      log_message logs_root, now, type, channel, nick, text if channel? and nick? and text?
-      robot.logger_orig_receive(message)
+    robot.adapter.bot.on 'message#', (nick, to, text, message) ->
+      result = (text + '').match(/^\x01ACTION (.*)\x01$/)
+      if !result
+        log_message(logs_root, new Tempus(), "message", to, {nick: nick, message: text, raw: message })
+      else
+        log_message(logs_root, new Tempus(), "action", to, {nick: nick, action: result[1], raw: message })
+    
+    robot.adapter.bot.on 'nick', (oldnick, newnick, channels, message) ->
+      result = (text + '').match(/^\x01ACTION (.*)\x01$/)
+      for channel in channels
+        log_message(logs_root, new Tempus(), "nick", channel, {nick: oldnick, new_nick: newnick })
+        
+    robot.adapter.bot.on 'topic', (channel, topic, nick, message) ->
+      log_message(logs_root, new Tempus(), "topic", channel, {nick: nick, topic: topic })
 
-    port = process.env.IRCLOGS_PORT || 8086
+    robot.adapter.bot.on 'join', (channel, nick, message) ->
+      log_message(logs_root, new Tempus(), "join", channel, { nick: nick })
+
+    robot.adapter.bot.on 'part', (channel, nick, reason, message) ->
+      log_message(logs_root, new Tempus(), "part", channel, { nick: nick, reason: reason })
+
+    robot.adapter.bot.on 'quit', (nick, reason, channels, message) ->
+      for channel in channels
+        log_message(logs_root, new Tempus(), "quit", channel, { nick: nick, reason: reason })
+
+    # robot.logger_orig_receive = robot.receive
+    # robot.receive = (message) ->
+    #   if message instanceof TextMessage
+    #     channel = message.room
+    #     nick = message.user.name
+    #     text = message.text
+    #     type = "message"
+    #   if message instanceof LeaveMessage
+    #     channel = message.room
+    #     nick = message.user.name
+    #     text = util.format("%s has left %s", nick, channel)
+    #     type = "quit"
+    #   if message instanceof EnterMessage
+    #     channel = message.room
+    #     nick = message.user.name
+    #     text = util.format("%s has joined %s", nick, channel)
+    #     type = "enter"
+    #   now = new Tempus()
+    #   log_message logs_root, now, type, channel, nick, text if channel? and nick? and text?
+    #   robot.logger_orig_receive(message)
 
     # init app
+    port = process.env.IRCLOGS_PORT || 8086
     robot.logger_app = express()
     robot.logger_app.configure( ->
       robot.logger_app.set 'views', __dirname + '/../views'

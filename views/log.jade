@@ -33,8 +33,8 @@ block body
                 !{nbsp}
 
             - if (event.type == 'message')
-              td.nick= '<' + event.user + '>'
-              td.content= event.text
+              td.nick= '<' + event.nick + '>'
+              td.content= event.message
 
             - if (event.type == 'action')
               td.nick= '* ' + event.nick
@@ -60,7 +60,7 @@ block body
               td.content joined
 
             - if (event.type == 'enter')
-              td.nick= '* ' + event.user
+              td.nick= '* ' + event.nick
               td.content= event.text
 
             - if (event.type == 'part' || event.type == 'quit')
