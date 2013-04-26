@@ -64,7 +64,7 @@ block body
               td.content= event.text
 
             - if (event.type == 'part' || event.type == 'quit')
-              td.nick= '* ' + event.user
+              td.nick= '* ' + event.nick
               td.content
                 = event.type
                 - if (event.reason)

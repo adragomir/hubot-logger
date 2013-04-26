@@ -45,7 +45,7 @@ render_log = (req, res, channel, file, date, dates, latest) ->
       try
         event = JSON.parse(json)
       catch e
-        util.puts("json parsing error: " + e)
+        null
       
       continue unless event?
 
@@ -89,7 +89,19 @@ module.exports = (robot) ->
     logs_root = process.env.IRCLOGS_FOLDER || "/var/irclogs/logs"
     mkdirp(logs_root)
 
-    robot.adapter.bot.on 'message#', (nick, to, text, message) ->
+    # robot.adapter.bot.on 'pm', (nick, text, message) ->
+    #   util.puts("PM--------------")
+    #   util.puts(util.inspect(message))
+
+    # robot.adapter.bot.on 'ctcp', (nick, text, message) ->
+    #   util.puts("CTCP--------------")
+    #   util.puts(util.inspect(message))
+
+    # robot.adapter.bot.on 'raw', (message) ->
+    #   util.puts("RAW--------------")
+    #   util.puts(util.inspect(message))
+
+    robot.adapter.bot.on 'message', (nick, to, text, message) ->
       result = (text + '').match(/^\x01ACTION (.*)\x01$/)
       if !result
         log_message(logs_root, new Tempus(), "message", to, {nick: nick, message: text, raw: message })
@@ -116,24 +128,11 @@ module.exports = (robot) ->
 
     # robot.logger_orig_receive = robot.receive
     # robot.receive = (message) ->
-    #   if message instanceof TextMessage
-    #     channel = message.room
-    #     nick = message.user.name
-    #     text = message.text
-    #     type = "message"
-    #   if message instanceof LeaveMessage
-    #     channel = message.room
-    #     nick = message.user.name
-    #     text = util.format("%s has left %s", nick, channel)
-    #     type = "quit"
-    #   if message instanceof EnterMessage
-    #     channel = message.room
-    #     nick = message.user.name
-    #     text = util.format("%s has joined %s", nick, channel)
-    #     type = "enter"
-    #   now = new Tempus()
-    #   log_message logs_root, now, type, channel, nick, text if channel? and nick? and text?
+    #   util.puts(util.inspect(message))
     #   robot.logger_orig_receive(message)
+
+    # robot.hear /.*$/i, (msg) ->
+    #   util.puts(util.inspect(msg))
 
     # init app
     port = process.env.IRCLOGS_PORT || 8086
