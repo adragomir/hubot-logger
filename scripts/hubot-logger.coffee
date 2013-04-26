@@ -1,3 +1,21 @@
+# Description:
+#   Logs all messages on an irc channel
+#
+# Dependencies:
+#   Tempus
+#   mkdirp
+#   express
+#   jade
+#
+# Configuration:
+#   IRCLOGS_FOLDER
+#
+# Commands:
+#   hubot otr - not yer implemented
+#
+# Author:
+#   adragomir
+
 # CREATE TABLE IF NOT EXISTS chanlog (id INTEGER PRIMARY KEY, ts INTEGER, chan VARCHAR(32), user VARCHAR(100), message TEXT);
 {Robot, Adapter, TextMessage, EnterMessage, LeaveMessage, CatchAllMessage} = require 'hubot'
 express = require "express"
