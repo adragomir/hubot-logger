@@ -127,7 +127,6 @@ module.exports = (robot) ->
         log_message(logs_root, new Tempus(), "action", to, {nick: nick, action: result[1], raw: message })
     
     robot.adapter.bot.on 'nick', (oldnick, newnick, channels, message) ->
-      result = (text + '').match(/^\x01ACTION (.*)\x01$/)
       for channel in channels
         log_message(logs_root, new Tempus(), "nick", channel, {nick: oldnick, new_nick: newnick })
         
