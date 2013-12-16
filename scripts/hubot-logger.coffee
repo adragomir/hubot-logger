@@ -9,6 +9,8 @@
 #
 # Configuration:
 #   IRCLOGS_FOLDER
+#   HUBOT_LOGGER_HTTP_LOGIN
+#   HUBOT_LOGGER_HTTP_PASSWORD
 #
 # Commands:
 #   hubot otr - not yer implemented
@@ -160,6 +162,8 @@ module.exports = (robot) ->
       robot.logger_app.set 'view engine', 'jade'
       robot.logger_app.use express.bodyParser()
       robot.logger_app.use express.methodOverride()
+      if process.env.HUBOT_LOGGER_HTTP_LOGIN? && process.env.HUBOT_LOGGER_HTTP_PASSWORD?
+        robot.logger_app.use express.basicAuth process.env.HUBOT_LOGGER_HTTP_LOGIN, process.env.HUBOT_LOGGER_HTTP_PASSWORD
       robot.logger_app.use robot.logger_app.router
     )
 
